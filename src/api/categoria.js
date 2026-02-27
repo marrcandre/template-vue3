@@ -5,7 +5,7 @@ export default class CategoriaApi {
     return data;
   }
   async adicionarCategoria(categoria) {
-    const { data } = await axios.post("/categorias/", categoria);
+    const { data } = await axios.post('/categorias/', categoria);
     return data;
   }
   async atualizarCategoria(categoria) {
