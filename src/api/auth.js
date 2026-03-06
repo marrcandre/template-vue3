@@ -1,12 +1,23 @@
-import axios from "axios";
+import axios from 'axios';
 
 export default class AuthService {
-  async postUserToken(token) {
-    const response = await axios.get("/usuarios/me/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  async login(email, password) {
+    const response = await axios.post('/token/', { email, password });
+    return response.data;
+  }
+
+  async refreshToken(refresh) {
+    const response = await axios.post('/token/refresh/', { refresh });
+    return response.data;
+  }
+
+  async register(email, name, password) {
+    const response = await axios.post('/registro/', { email, name, password });
+    return response.data;
+  }
+
+  async getUser() {
+    const response = await axios.get('/usuarios/me/');
     return response.data;
   }
 }

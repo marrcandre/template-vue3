@@ -7,32 +7,42 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const email = ref('');
+const name = ref('');
 const password = ref('');
+const passwordConfirm = ref('');
 const error = ref('');
 
-async function handleLogin() {
+async function handleRegister() {
   error.value = '';
+  if (password.value !== passwordConfirm.value) {
+    error.value = 'As senhas não conferem.';
+    return;
+  }
   try {
-    await authStore.login(email.value, password.value);
+    await authStore.register(email.value, name.value, password.value);
     router.push({ name: 'home' });
   } catch (err) {
-    error.value = 'Email ou senha inválidos.';
+    error.value = err.response?.data?.email?.[0]
+      || err.response?.data?.password?.[0]
+      || 'Erro ao criar conta. Verifique os dados.';
   }
 }
 </script>
 
 <template>
   <div class="container">
-    <h1>Login</h1>
+    <h1>Cadastro</h1>
     <div class="authContainer">
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleRegister">
+        <input type="text" v-model="name" placeholder="Nome" />
         <input type="email" v-model="email" placeholder="Email" required />
-        <input type="password" v-model="password" placeholder="Senha" required />
+        <input type="password" v-model="password" placeholder="Senha (mínimo 8 caracteres)" required />
+        <input type="password" v-model="passwordConfirm" placeholder="Confirmar senha" required />
         <p v-if="error" class="error">{{ error }}</p>
-        <button type="submit">Entrar</button>
+        <button type="submit">Cadastrar</button>
       </form>
-      <p class="register-link">
-        Não tem conta? <router-link :to="{ name: 'registro' }">Cadastre-se</router-link>
+      <p class="login-link">
+        Já tem conta? <router-link :to="{ name: 'login' }">Faça login</router-link>
       </p>
     </div>
   </div>
@@ -98,12 +108,12 @@ button:hover {
   margin: 0;
 }
 
-.register-link {
+.login-link {
   margin-top: 20px;
   color: #555;
 }
 
-.register-link a {
+.login-link a {
   color: #343a40;
   font-weight: bold;
 }

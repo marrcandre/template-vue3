@@ -8,15 +8,37 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref({});
   const loggedIn = ref(false);
 
-  async function setToken(token) {
-    user.value = await authService.postUserToken(token);
+  async function login(email, password) {
+    const data = await authService.login(email, password);
+    localStorage.setItem('access_token', data.access);
+    localStorage.setItem('refresh_token', data.refresh);
+    user.value = await authService.getUser();
     loggedIn.value = true;
   }
 
-  function unsetToken() {
-    user.value = {};
-    loggedIn.value = false;
+  async function register(email, name, password) {
+    await authService.register(email, name, password);
+    await login(email, password);
   }
 
-  return { user, loggedIn, setToken, unsetToken };
+  function logout() {
+    user.value = {};
+    loggedIn.value = false;
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+
+  async function checkAuth() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      try {
+        user.value = await authService.getUser();
+        loggedIn.value = true;
+      } catch {
+        logout();
+      }
+    }
+  }
+
+  return { user, loggedIn, login, register, logout, checkAuth };
 });
