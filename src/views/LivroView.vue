@@ -35,7 +35,7 @@ function mostrar() {
       <li v-for="livro in livros" :key="livro.id">
         <div class="livro-info" @click="editar(livro)">
           <img
-            :src="livro.capa || 'https://via.placeholder.com/150'"
+            :src="livro.capa || 'https://placehold.co/150'"
             alt="Capa do Livro"
             class="livro-capa"
           />

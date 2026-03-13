@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useAuthStore } from '@/stores/auth'; // Importa a store de autenticação
+import { ref, computed } from "vue";
+import { useAuthStore } from "@/stores/auth"; // Importa a store de autenticação
 
 const authStore = useAuthStore();
 
@@ -40,14 +40,17 @@ const toggleDropdown = () => {
           />
           <img
             v-else
-            src="https://via.placeholder.com/50"
+            src="https://placehold.co/50"
             alt="Sem foto"
             class="user-photo-small"
           />
 
           <div v-if="showDropdown" class="dropdown-menu">
-            <p><strong>{{ user.name }}</strong></p>
-            <p class="email">{{ user.email }}</p> <!-- Adiciona classe email -->
+            <p>
+              <strong>{{ user.name }}</strong>
+            </p>
+            <p class="email">{{ user.email }}</p>
+            <!-- Adiciona classe email -->
             <router-link to="/logout" class="dropdown-item">Logout</router-link>
           </div>
         </div>
