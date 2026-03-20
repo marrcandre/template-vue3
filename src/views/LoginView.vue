@@ -2,8 +2,10 @@
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
+import { useToastStore } from '@/stores/toast';
 
 const authStore = useAuthStore();
+const toastStore = useToastStore();
 const router = useRouter();
 
 const email = ref('');
@@ -17,101 +19,32 @@ async function handleLogin() {
     router.push({ name: 'home' });
   } catch (err) {
     error.value = 'Email ou senha inválidos.';
+    toastStore.showToast('Email ou senha inválidos.', 'error');
   }
 }
 </script>
 
 <template>
-  <div class="container">
-    <h1>Login</h1>
-    <div class="authContainer">
+  <div class="auth-page">
+    <h1 class="page-title text-center">Login</h1>
+    <div class="card auth-card">
       <form @submit.prevent="handleLogin">
-        <input type="email" v-model="email" placeholder="Email" required />
-        <input type="password" v-model="password" placeholder="Senha" required />
-        <p v-if="error" class="error">{{ error }}</p>
-        <button type="submit">Entrar</button>
+        <div class="form-group">
+          <label class="label" for="email">Email!</label>
+          <input id="email" type="email" v-model="email" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="label" for="password">Senha</label>
+          <input id="password" type="password" v-model="password" autocomplete="current-password" required />
+        </div>
+        <p v-if="error" class="error-msg">{{ error }}</p>
+        <button type="submit" class="btn" style="width:100%">Entrar</button>
       </form>
-      <p class="register-link">
+      <p class="text-muted text-sm" style="margin-top:16px;text-align:center">
         Não tem conta? <router-link :to="{ name: 'registro' }">Cadastre-se</router-link>
       </p>
     </div>
   </div>
 </template>
 
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
 
-h1 {
-  font-size: 2rem;
-  color: #343a40;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.authContainer {
-  background-color: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  margin: 20px auto;
-  text-align: center;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-input {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-button {
-  padding: 12px;
-  background-color: #343a40;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #000;
-}
-
-.error {
-  color: #dc3545;
-  margin: 0;
-}
-
-.register-link {
-  margin-top: 20px;
-  color: #555;
-}
-
-.register-link a {
-  color: #343a40;
-  font-weight: bold;
-}
-
-@media (max-width: 600px) {
-  .authContainer {
-    padding: 20px;
-    max-width: 90%;
-  }
-}
-</style>

@@ -12,7 +12,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h1>Saindo...</h1>
+  <div class="page">
+    <p class="text-muted text-center">Saindo...</p>
+  </div>
 </template>
-
-<style></style>

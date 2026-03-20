@@ -6,6 +6,12 @@ import LogoutView from "../views/LogoutView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import UsuarioView from "../views/UsuarioView.vue";
 import LivroView from "../views/LivroView.vue";
+import EditoraView from "../views/EditoraView.vue";
+import AutorView from "../views/AutorView.vue";
+import CarrinhoView from "../views/CarrinhoView.vue";
+import ComprasView from "../views/ComprasView.vue";
+import FavoritosView from "../views/FavoritosView.vue";
+import NotFoundView from "../views/NotFoundView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +34,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/editoras",
+      name: "editoras",
+      component: EditoraView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/autores",
+      name: "autores",
+      component: AutorView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/login",
       name: "login",
       component: LoginView,
@@ -44,9 +62,32 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/carrinho",
+      name: "carrinho",
+      component: CarrinhoView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/compras",
+      name: "compras",
+      component: ComprasView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/favoritos",
+      name: "favoritos",
+      component: FavoritosView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/logout",
       name: "logout",
       component: LogoutView,
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      component: NotFoundView,
     }
   ],
 });

@@ -1,197 +1,82 @@
 <script setup>
-import { ref, computed } from "vue";
-import { useAuthStore } from "@/stores/auth"; // Importa a store de autenticação
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
-
-// Computa se o usuário está logado e obtém os dados do usuário
 const isLoggedIn = computed(() => authStore.loggedIn);
 const user = computed(() => authStore.user);
-
-// Estado reativo para controlar o dropdown
+const canManage = computed(() => authStore.canManage);
 const showDropdown = ref(false);
 
-// Função para alternar o dropdown
-const toggleDropdown = () => {
+function toggleDropdown() {
   showDropdown.value = !showDropdown.value;
-};
+}
+function closeDropdown(e) {
+  if (!e.target.closest(".user-menu")) showDropdown.value = false;
+}
+onMounted(() => document.addEventListener("click", closeDropdown));
+onUnmounted(() => document.removeEventListener("click", closeDropdown));
 </script>
 
 <template>
   <header class="navbar">
     <nav>
       <div class="nav-left">
-        <router-link :to="{ name: 'home' }" class="logo">Livraria</router-link>
-        <router-link :to="{ name: 'categorias' }">Categorias</router-link>
-        <router-link :to="{ name: 'livros' }">Livros</router-link>
+        <router-link :to="{ name: 'home' }" class="nav-link nav-logo">Livraria</router-link>
+        <router-link v-if="canManage" :to="{ name: 'categorias' }" class="nav-link">Categorias</router-link>
+        <router-link v-if="canManage" :to="{ name: 'editoras' }" class="nav-link">Editoras</router-link>
+        <router-link v-if="canManage" :to="{ name: 'autores' }" class="nav-link">Autores</router-link>
+        <router-link :to="{ name: 'livros' }" class="nav-link">Livros</router-link>
       </div>
 
       <div class="nav-right" v-if="isLoggedIn">
-        <!-- Link para o perfil alinhado à esquerda -->
-        <router-link to="/usuario" class="profile-link">Perfil</router-link>
+        <router-link :to="{ name: 'carrinho' }" class="nav-link" title="Carrinho">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </router-link>
+        <router-link :to="{ name: 'compras' }" class="nav-link">Compras</router-link>
+        <router-link :to="{ name: 'favoritos' }" class="nav-link">Favoritos</router-link>
 
-        <!-- Foto do usuário com dropdown -->
         <div class="user-menu" @click="toggleDropdown">
           <img
-            v-if="user.foto && user.foto.url"
-            :src="user.foto.url"
-            alt="Foto do usuário"
-            class="user-photo-small"
+            :src="user.foto?.url || 'https://placehold.co/36'"
+            alt="Menu do usuário"
+            class="user-photo"
           />
-          <img
-            v-else
-            src="https://placehold.co/50"
-            alt="Sem foto"
-            class="user-photo-small"
-          />
-
-          <div v-if="showDropdown" class="dropdown-menu">
-            <p>
-              <strong>{{ user.name }}</strong>
-            </p>
-            <p class="email">{{ user.email }}</p>
-            <!-- Adiciona classe email -->
-            <router-link to="/logout" class="dropdown-item">Logout</router-link>
+          <div v-if="showDropdown" class="dropdown">
+            <p class="dropdown-name">{{ user.name }}</p>
+            <p class="dropdown-email">{{ user.email }}</p>
+            <router-link :to="{ name: 'usuario' }" class="dropdown-item">Perfil</router-link>
+            <router-link to="/logout" class="dropdown-item">Sair</router-link>
           </div>
         </div>
       </div>
 
       <div class="nav-right" v-else>
-        <router-link to="/login" class="login-btn">Login</router-link>
+        <router-link to="/login" class="nav-link">Login</router-link>
       </div>
     </nav>
   </header>
 </template>
 
 <style scoped>
-/* Estilos gerais da barra de navegação */
-.navbar {
-  background-color: #343a40;
-  color: #fff;
-  padding: 15px 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.user-menu { position: relative; cursor: pointer; margin-left: 4px; }
+.user-photo {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3); transition: border-color 0.15s;
 }
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.user-photo:hover { border-color: rgba(255,255,255,0.7); }
+.dropdown {
+  position: absolute; top: 44px; right: 0;
+  background: var(--card); color: var(--card-foreground);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px; min-width: 200px; z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
-.nav-left {
-  display: flex;
-  align-items: center;
-}
-
-.nav-left a {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 20px;
-  font-weight: bold;
-}
-
-.logo {
-  font-size: 1.5rem;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-}
-
-.profile-link {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 15px;
-  font-weight: bold;
-}
-
-.user-menu {
-  position: relative;
-  cursor: pointer;
-}
-
-.user-photo-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-  transition: border-color 0.3s;
-}
-
-.user-photo-small:hover {
-  border-color: #4a90e2;
-}
-
-/* Dropdown menu */
-.dropdown-menu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background-color: #fff;
-  color: #333;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
-  z-index: 1000;
-  min-width: 200px; /* Define um tamanho mínimo para o dropdown */
-}
-
-.dropdown-menu p {
-  margin: 0;
-  padding: 5px 0;
-}
-
+.dropdown-name { font-weight: 600; font-size: 0.875rem; margin-bottom: 2px; }
+.dropdown-email { font-size: 0.8rem; color: var(--muted-foreground); margin-bottom: 8px; word-break: break-all; }
 .dropdown-item {
-  display: block;
-  color: #333;
-  text-decoration: none;
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  display: block; text-decoration: none; color: var(--card-foreground);
+  padding: 6px 8px; border-radius: calc(var(--radius) - 2px); font-size: 0.875rem;
 }
-
-.dropdown-item:hover {
-  background-color: #f4f4f4;
-}
-
-/* Estilo específico para o email */
-.email {
-  word-wrap: break-word; /* Garante que o e-mail quebre de forma adequada se for longo */
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-/* Estilos do botão de login */
-.login-btn {
-  background-color: #555;
-  padding: 10px 20px;
-  color: white;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.login-btn:hover {
-  background-color: #000;
-}
-
-/* Responsividade */
-@media (max-width: 600px) {
-  .navbar {
-    padding: 10px;
-  }
-
-  .nav-left a {
-    margin-right: 10px;
-  }
-
-  .user-photo-small {
-    width: 35px;
-    height: 35px;
-  }
-}
+.dropdown-item:hover { background: var(--accent); }
 </style>

@@ -6,27 +6,17 @@ import CategoriaApi from '@/api/categoria'
 const categoriaApi = new CategoriaApi()
 
 export const useCategoriaStore = defineStore('categoria', () => {
-  const categorias = ref([
-    {
-      id: 1,
-      descricao: 'Categoria 1'
-    },
-    {
-      id: 2,
-      descricao: 'Categoria 2'
-    },
-    {
-      id: 3,
-      descricao: 'Categoria 3'
-    }
-  ])
+  const categorias = ref([])
   const meta = ref({
     page: 0,
     page_size: 0,
     total_pages: 0
   })
 
+  const currentSearch = ref('')
+
   async function getCategorias(page = 1, search = '') {
+    currentSearch.value = search
     const data = await categoriaApi.buscarTodasAsCategorias(page, search)
     categorias.value = data.results
     meta.value.page = data.page
@@ -35,7 +25,6 @@ export const useCategoriaStore = defineStore('categoria', () => {
   }
 
   async function search(text) {
-    console.log(text)
     await getCategorias(1, text)
   }
 
@@ -57,11 +46,11 @@ export const useCategoriaStore = defineStore('categoria', () => {
   }
 
   async function proximaPagina() {
-    await getCategorias(meta.value.page + 1)
+    await getCategorias(meta.value.page + 1, currentSearch.value)
   }
 
   async function paginaAnterior() {
-    await getCategorias(meta.value.page - 1)
+    await getCategorias(meta.value.page - 1, currentSearch.value)
   }
 
   return {

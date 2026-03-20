@@ -72,33 +72,25 @@ const selectedItemIndex = ref(-1); // Novo estado para rastrear o item seleciona
 
 const openSearch = () => {
   searching.value = true;
-  document.getElementById("autocomplete-list").focus();
 };
-
-// watch(value, (newValue) => {
-//   model.value = newValue;
-// });
-
-// watch(model, (newValue) => {
-//   value.value = newValue;
-// });
 </script>
 <template>
   <div @keydown="handleKeyDown">
     <div class="autocomplete">
       <input
+        class="input"
         @input="filterItems"
         :value="value"
         type="text"
         :placeholder="props.placeholder"
         @focus="openSearch"
       />
-      <ul v-show="searching" id="autocomplete-list" class="autocomplete-list">
+      <ul v-show="searching" class="autocomplete-list">
         <li
           v-for="(item, index) in props.items"
           :key="item.id"
           @click="selectItem(item)"
-          :class="{ 'selected-item': selectedItemIndex === index }"
+          :class="{ active: selectedItemIndex === index }"
           tabindex="0"
         >
           {{ item[props.itemText] }}
@@ -107,34 +99,3 @@ const openSearch = () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.autocomplete {
-  position: relative;
-  display: inline-block;
-}
-
-.autocomplete-list {
-  position: absolute;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  width: 100%;
-  z-index: 1000;
-}
-.autocomplete-list li {
-  padding: 10px;
-  cursor: pointer;
-  z-index: 1001;
-}
-.autocomplete-list li:hover {
-  background-color: #f0f0f0;
-}
-
-.selected-item {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-</style>

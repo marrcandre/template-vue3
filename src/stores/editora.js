@@ -6,20 +6,17 @@ import EditoraApi from '@/api/editora'
 const editoraApi = new EditoraApi()
 
 export const useEditoraStore = defineStore('editora', () => {
-  const editoras = ref([
-    {
-      id: 1,
-      descricao: 'Editora 1'
-    },
-
-  ])
+  const editoras = ref([])
   const meta = ref({
     page: 0,
     page_size: 0,
     total_pages: 0
   })
 
+  const currentSearch = ref('')
+
   async function getEditoras(page = 1, search = '') {
+    currentSearch.value = search
     const data = await editoraApi.buscarTodasAsEditoras(page, search)
     editoras.value = data.results
     meta.value.page = data.page
@@ -31,29 +28,29 @@ export const useEditoraStore = defineStore('editora', () => {
     await getEditoras(1, text)
   }
 
-  async function excluirCategoria(id) {
-    await categoriaApi.excluirCategoria(id)
-    const index = categorias.value.findIndex((categoria) => categoria.id === id)
-    categorias.value.splice(index, 1)
+  async function excluirEditora(id) {
+    await editoraApi.excluirEditora(id)
+    const index = editoras.value.findIndex((editora) => editora.id === id)
+    editoras.value.splice(index, 1)
   }
 
-  async function salvarCategoria(categoria) {
-    if (categoria.id) {
-      await categoriaApi.atualizarCategoria(categoria)
-      const index = categorias.value.findIndex((c) => c.id === categoria.id)
-      categorias.value.splice(index, 1, categoria)
+  async function salvarEditora(editora) {
+    if (editora.id) {
+      await editoraApi.atualizarEditora(editora)
+      const index = editoras.value.findIndex((e) => e.id === editora.id)
+      editoras.value.splice(index, 1, editora)
     } else {
-      const data = await categoriaApi.adicionarCategoria(categoria)
-      categorias.value.splice(0, 0, data)
+      const data = await editoraApi.adicionarEditora(editora)
+      editoras.value.splice(0, 0, data)
     }
   }
 
   async function proximaPagina() {
-    await getCategorias(meta.value.page + 1)
+    await getEditoras(meta.value.page + 1, currentSearch.value)
   }
 
   async function paginaAnterior() {
-    await getCategorias(meta.value.page - 1)
+    await getEditoras(meta.value.page - 1, currentSearch.value)
   }
 
   return {
@@ -61,8 +58,8 @@ export const useEditoraStore = defineStore('editora', () => {
     meta,
     getEditoras,
     search,
-    salvarCategoria,
-    excluirCategoria,
+    salvarEditora,
+    excluirEditora,
     proximaPagina,
     paginaAnterior
   }

@@ -1,14 +1,22 @@
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import AuthService from '@/api/auth';
 const authService = new AuthService();
 
+const TIPO_USUARIO = { CLIENTE: 1, VENDEDOR: 2, GERENTE: 3 };
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref({});
   const loggedIn = ref(false);
 
-  async function login(email, password) {
+  const isCliente = computed(() => user.value.tipo_usuario === TIPO_USUARIO.CLIENTE);
+  const isVendedor = computed(() => user.value.tipo_usuario === TIPO_USUARIO.VENDEDOR);
+  const isGerente = computed(() => user.value.tipo_usuario === TIPO_USUARIO.GERENTE);
+  const isAdmin = computed(() => user.value.is_superuser || user.value.is_staff);
+  const canManage = computed(() => isVendedor.value || isGerente.value || isAdmin.value);
+
+  const login = async (email, password) => {
     const data = await authService.login(email, password);
     localStorage.setItem('access_token', data.access);
     localStorage.setItem('refresh_token', data.refresh);
@@ -40,5 +48,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, loggedIn, login, register, logout, checkAuth };
+  return {
+    user, loggedIn,
+    isCliente, isVendedor, isGerente, isAdmin, canManage,
+    login, register, logout, checkAuth
+  };
 });

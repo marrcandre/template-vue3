@@ -8,41 +8,16 @@ const user = computed(() => authStore.user);
 </script>
 
 <template>
-  <div class="container">
+  <div class="page" style="text-align:center;padding-top:60px">
     <div v-if="isLoggedIn">
-      <h1>Bem-vindo, {{ user.name || user.email }}!</h1>
-      <p>Use o menu acima para navegar pelo sistema.</p>
+      <h1 class="page-title">Bem-vindo, {{ user.name || user.email }}!</h1>
+      <p class="text-muted">Use o menu acima para navegar pelo sistema.</p>
     </div>
     <div v-else>
-      <h1>Bem-vindo à Livraria</h1>
-      <p>Faça <router-link :to="{ name: 'login' }">login</router-link> para acessar o sistema.</p>
+      <h1 class="page-title">Bem-vindo à Livraria</h1>
+      <p class="text-muted">
+        Faça <router-link :to="{ name: 'login' }">login</router-link> para acessar o sistema.
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding: 40px 20px;
-}
-
-h1 {
-  font-size: 2rem;
-  color: #343a40;
-  margin-bottom: 10px;
-}
-
-p {
-  font-size: 1.1rem;
-  color: #555;
-}
-
-p a {
-  color: #343a40;
-  font-weight: bold;
-}
-</style>
