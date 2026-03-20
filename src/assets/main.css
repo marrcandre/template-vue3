@@ -60,6 +60,14 @@ textarea { resize: vertical; min-height: 60px; }
 .btn-ghost { background: transparent; color: var(--foreground); }
 .btn-ghost:hover { background: var(--accent); }
 .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+.btn-icon-sm {
+  width: 30px; height: 30px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: calc(var(--radius) - 2px);
+}
+.btn-icon-sm svg { flex-shrink: 0; }
+.btn-fav { color: var(--destructive); padding: 4px 8px; }
+.btn-fav:hover { color: var(--destructive); opacity: 0.8; }
 .btn-icon {
   width: 36px; height: 36px; padding: 0;
   border-radius: calc(var(--radius) - 2px);
@@ -137,6 +145,14 @@ textarea { resize: vertical; min-height: 60px; }
 .empty-state a { color: var(--foreground); font-weight: 500; }
 
 /* ===== Search ===== */
+.search-wrapper { position: relative; width: 100%; margin-bottom: 16px; }
+.search-wrapper .search-input { width: 100%; padding-right: 32px; margin-bottom: 0; }
+.search-clear {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: var(--muted-foreground);
+  font-size: 1.1rem; line-height: 1; padding: 2px 4px;
+}
+.search-clear:hover { color: var(--foreground); }
 .search-input { width: 100%; margin-bottom: 16px; }
 
 /* ===== Auth pages ===== */

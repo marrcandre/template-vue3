@@ -9,8 +9,8 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { useToastStore } from './stores/toast';
-import Navbar from './views/NavBar.vue';
+import { useToastStore } from '@/stores/toast';
+import Navbar from '@/views/NavBar.vue';
 import ToastMessage from './components/ToastMessage.vue';
 
 const authStore = useAuthStore();

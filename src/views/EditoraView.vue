@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useEditoraStore } from '@/stores/editora'
 import { useToastStore } from '@/stores/toast'
 
@@ -13,6 +13,10 @@ let buscaTimer = null
 
 onMounted(async () => {
   await editoraStore.getEditoras()
+})
+
+onUnmounted(() => {
+  clearTimeout(buscaTimer)
 })
 
 function onBusca() {
@@ -76,15 +80,18 @@ async function excluir(id) {
       <button class="btn btn-outline" @click="limpar">Limpar</button>
     </div>
 
-    <input class="search-input" type="text" v-model="busca" @input="onBusca" placeholder="Buscar editoras..." />
+    <div class="search-wrapper">
+      <input class="search-input" type="text" v-model="busca" @input="onBusca" placeholder="Buscar editoras..." />
+      <button v-if="busca" class="search-clear" @click="busca = ''; onBusca()">&times;</button>
+    </div>
 
     <div v-if="!editoraStore.editoras.length" class="empty-state">Nenhuma editora cadastrada.</div>
     <ul class="list" v-else>
       <li class="list-item" v-for="ed in editoraStore.editoras" :key="ed.id">
         <span>({{ ed.id }}) — {{ ed.nome }} <span class="text-muted text-sm" v-if="ed.cidade">— {{ ed.cidade }}</span></span>
         <div class="list-item-actions">
-          <button class="btn btn-outline btn-sm" @click="editar(ed)">Editar</button>
-          <button class="btn btn-destructive btn-sm" @click="excluir(ed.id)">Excluir</button>
+          <button class="btn btn-outline btn-sm btn-icon-sm" @click="editar(ed)" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn btn-destructive btn-sm btn-icon-sm" @click="excluir(ed.id)" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </div>
       </li>
     </ul>

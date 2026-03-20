@@ -10,15 +10,12 @@ const router = useRouter();
 
 const email = ref('');
 const password = ref('');
-const error = ref('');
 
 async function handleLogin() {
-  error.value = '';
   try {
     await authStore.login(email.value, password.value);
     router.push({ name: 'home' });
   } catch (err) {
-    error.value = 'Email ou senha inválidos.';
     toastStore.showToast('Email ou senha inválidos.', 'error');
   }
 }
@@ -30,14 +27,13 @@ async function handleLogin() {
     <div class="card auth-card">
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label class="label" for="email">Email!</label>
+          <label class="label" for="email">Email</label>
           <input id="email" type="email" v-model="email" autocomplete="email" required />
         </div>
         <div class="form-group">
           <label class="label" for="password">Senha</label>
           <input id="password" type="password" v-model="password" autocomplete="current-password" required />
         </div>
-        <p v-if="error" class="error-msg">{{ error }}</p>
         <button type="submit" class="btn" style="width:100%">Entrar</button>
       </form>
       <p class="text-muted text-sm" style="margin-top:16px;text-align:center">

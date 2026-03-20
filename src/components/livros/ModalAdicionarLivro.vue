@@ -6,12 +6,14 @@ import { useEditoraStore } from "@/stores/editora";
 import { useLivroStore } from "@/stores/livro";
 import { useAutorStore } from "@/stores/autor";
 import UploadApi from "@/api/upload";
+import { useToastStore } from "@/stores/toast";
 
 const uploadApi = new UploadApi();
 const categoriaStore = useCategoriaStore();
 const editoraStore = useEditoraStore();
 const livroStore = useLivroStore();
 const autorStore = useAutorStore();
+const toast = useToastStore();
 
 const props = defineProps({
   livroParaEditar: { type: Object, default: null },
@@ -34,6 +36,8 @@ const imagePreview = ref(null);
 const imageFile = ref(null);
 const autorSelecionado = ref(null);
 const autoresSelecionados = ref([]);
+const categoriaTexto = ref('');
+const editoraTexto = ref('');
 
 watch(
   () => props.livroParaEditar,
@@ -46,6 +50,8 @@ watch(
       livro.preco = val.preco || 0;
       livro.categoria = val.categoria?.id || val.categoria || "";
       livro.editora = val.editora?.id || val.editora || "";
+      categoriaTexto.value = val.categoria?.descricao || '';
+      editoraTexto.value = val.editora?.nome || '';
       livro.autores = val.autores
         ? val.autores.map((a) => (typeof a === "object" ? a.id : a))
         : [];
@@ -61,9 +67,10 @@ watch(
   { immediate: true }
 );
 
+const fileInputRef = ref(null);
+
 function openSelectImage() {
-  const input = document.querySelector("input[type='file']");
-  if (input) input.click();
+  fileInputRef.value?.click();
 }
 
 function selectImage(evt) {
@@ -84,6 +91,8 @@ function limpar() {
   imageFile.value = null;
   autoresSelecionados.value = [];
   autorSelecionado.value = null;
+  categoriaTexto.value = '';
+  editoraTexto.value = '';
 }
 
 function adicionarAutor(autorId) {
@@ -103,30 +112,34 @@ function removerAutor(autorId) {
 }
 
 async function salvar() {
-  if (imageFile.value) {
-    const uploaded = await uploadApi.uploadImagem(imageFile.value);
-    livro.capa_attachment_key = uploaded.attachment_key;
-  }
+  try {
+    if (imageFile.value) {
+      const uploaded = await uploadApi.uploadImagem(imageFile.value);
+      livro.capa_attachment_key = uploaded.attachment_key;
+    }
 
-  const payload = {
-    titulo: livro.titulo,
-    isbn: livro.isbn,
-    quantidade: livro.quantidade,
-    preco: livro.preco,
-    categoria: livro.categoria || null,
-    editora: livro.editora || null,
-    autores: livro.autores,
-  };
-  if (livro.capa_attachment_key) {
-    payload.capa_attachment_key = livro.capa_attachment_key;
-  }
-  if (livro.id) {
-    payload.id = livro.id;
-  }
+    const payload = {
+      titulo: livro.titulo,
+      isbn: livro.isbn,
+      quantidade: livro.quantidade,
+      preco: livro.preco,
+      categoria: livro.categoria || null,
+      editora: livro.editora || null,
+      autores: livro.autores,
+    };
+    if (livro.capa_attachment_key) {
+      payload.capa_attachment_key = livro.capa_attachment_key;
+    }
+    if (livro.id) {
+      payload.id = livro.id;
+    }
 
-  await livroStore.salvarLivro(payload);
-  limpar();
-  emit("salvo");
+    await livroStore.salvarLivro(payload);
+    limpar();
+    emit("salvo");
+  } catch (error) {
+    toast.showToast(error.response?.data?.detail || 'Erro ao salvar livro.', 'error');
+  }
 }
 
 onMounted(() => {
@@ -155,6 +168,7 @@ onMounted(() => {
                 :search="categoriaStore.search"
                 item-text="descricao"
                 placeholder="Categoria"
+                :initial-text="categoriaTexto"
               />
             </div>
           </div>
@@ -167,6 +181,7 @@ onMounted(() => {
                 :search="editoraStore.search"
                 item-text="nome"
                 placeholder="Editora"
+                :initial-text="editoraTexto"
               />
             </div>
             <div class="form-group" style="flex: 1.5">
@@ -212,7 +227,7 @@ onMounted(() => {
               alt="Capa do Livro"
             />
           </div>
-          <input type="file" hidden @input="selectImage" accept="image/jpeg,image/png" />
+          <input ref="fileInputRef" type="file" hidden @input="selectImage" accept="image/jpeg,image/png" />
           <div class="modal-actions">
             <button class="btn" @click="salvar">Salvar</button>
             <button class="btn btn-outline" @click="limpar">Limpar</button>

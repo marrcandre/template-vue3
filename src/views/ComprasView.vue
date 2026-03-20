@@ -1,26 +1,19 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useCompraStore } from '@/stores/compra'
+import { useToastStore } from '@/stores/toast'
+import { formatarPreco, formatarData } from '@/utils/formatters'
 
 const compraStore = useCompraStore()
+const toast = useToastStore()
 
 onMounted(async () => {
-  await compraStore.getCompras()
+  try {
+    await compraStore.getCompras()
+  } catch (error) {
+    toast.showToast('Erro ao carregar compras.', 'error')
+  }
 })
-
-function formatarPreco(valor) {
-  return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-function formatarData(data) {
-  return new Date(data).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 function badgeClass(status) {
   const map = { carrinho: 'badge-warning', finalizado: 'badge-info', pago: 'badge-success', entregue: 'badge-muted' }
@@ -48,7 +41,7 @@ function badgeClass(status) {
         </div>
         <ul class="compra-itens" v-if="compra.itens">
           <li v-for="(item, idx) in compra.itens" :key="idx">
-            {{ item.livro }} — Qtd: {{ item.quantidade }} — {{ formatarPreco(item.preco) }}
+            {{ item.livro.titulo || item.livro }} — Qtd: {{ item.quantidade }} — {{ formatarPreco(item.preco) }}
           </li>
         </ul>
       </div>

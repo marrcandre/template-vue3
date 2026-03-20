@@ -1,8 +1,8 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
 const props = defineProps({
   items: {
-    type: Object,
+    type: Array,
     required: true,
   },
   search: {
@@ -16,6 +16,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: "Digite para pesquisar",
+  },
+  initialText: {
+    type: String,
+    default: "",
   },
 });
 
@@ -48,7 +52,11 @@ const handleKeyDown = (event) => {
 };
 
 const model = defineModel();
-const value = ref(model.value || "");
+const value = ref(props.initialText || "");
+
+watch(() => props.initialText, (newText) => {
+  if (newText) value.value = newText;
+});
 
 const searching = ref(false);
 const timer = ref(null);
@@ -68,7 +76,11 @@ const filterItems = (event) => {
   }, 500);
 };
 
-const selectedItemIndex = ref(-1); // Novo estado para rastrear o item selecionado
+const selectedItemIndex = ref(-1);
+
+onBeforeUnmount(() => {
+  clearTimeout(timer.value);
+});
 
 const openSearch = () => {
   searching.value = true;

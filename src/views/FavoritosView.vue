@@ -6,16 +6,23 @@ import { useToastStore } from '@/stores/toast'
 const favoritoStore = useFavoritoStore()
 const toast = useToastStore()
 const editandoId = ref(null)
-const editNota = ref(null)
 const editComentario = ref('')
 
 onMounted(async () => {
   await favoritoStore.getFavoritos()
 })
 
+async function alterarNota(fav, novaNota) {
+  try {
+    await favoritoStore.atualizarFavorito(fav.id, { nota: novaNota })
+    toast.showToast('Nota atualizada.')
+  } catch (error) {
+    toast.showToast(error.response?.data?.detail || 'Erro ao atualizar nota.', 'error')
+  }
+}
+
 function iniciarEdicao(fav) {
   editandoId.value = fav.id
-  editNota.value = fav.nota
   editComentario.value = fav.comentario || ''
 }
 
@@ -23,16 +30,13 @@ function cancelarEdicao() {
   editandoId.value = null
 }
 
-async function salvarEdicao(id) {
+async function salvarComentario(id) {
   try {
-    await favoritoStore.atualizarFavorito(id, {
-      nota: editNota.value,
-      comentario: editComentario.value
-    })
+    await favoritoStore.atualizarFavorito(id, { comentario: editComentario.value })
     editandoId.value = null
-    toast.showToast('Favorito atualizado.')
+    toast.showToast('Comentário atualizado.')
   } catch (error) {
-    toast.showToast(error.response?.data?.detail || 'Erro ao atualizar favorito.', 'error')
+    toast.showToast(error.response?.data?.detail || 'Erro ao atualizar comentário.', 'error')
   }
 }
 
@@ -65,36 +69,29 @@ function formatarData(data) {
           <small class="text-muted">{{ formatarData(fav.data_atualizacao) }}</small>
         </div>
 
+        <div class="stars">
+          <span
+            v-for="n in 5"
+            :key="n"
+            class="star clickable"
+            :class="{ active: n <= fav.nota }"
+            @click="alterarNota(fav, n)"
+          >&#9733;</span>
+        </div>
+
         <div v-if="editandoId === fav.id">
-          <div class="stars">
-            <span
-              v-for="n in 5"
-              :key="n"
-              class="star clickable"
-              :class="{ active: n <= editNota }"
-              @click="editNota = n"
-            >&#9733;</span>
-          </div>
           <textarea class="input" v-model="editComentario" placeholder="Comentário" rows="2"></textarea>
           <div class="fav-actions">
-            <button class="btn btn-sm" @click="salvarEdicao(fav.id)">Salvar</button>
+            <button class="btn btn-sm" @click="salvarComentario(fav.id)">Salvar</button>
             <button class="btn btn-outline btn-sm" @click="cancelarEdicao">Cancelar</button>
           </div>
         </div>
 
         <div v-else>
-          <div class="stars">
-            <span
-              v-for="n in 5"
-              :key="n"
-              class="star"
-              :class="{ active: n <= fav.nota }"
-            >&#9733;</span>
-          </div>
           <p v-if="fav.comentario" class="text-muted" style="margin-bottom: 0.5rem;">{{ fav.comentario }}</p>
           <div class="fav-actions">
-            <button class="btn btn-outline btn-sm" @click="iniciarEdicao(fav)">Editar</button>
-            <button class="btn btn-destructive btn-sm" @click="excluir(fav.id)">Remover</button>
+            <button class="btn btn-outline btn-sm btn-icon-sm" @click="iniciarEdicao(fav)" title="Editar comentário"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="btn btn-destructive btn-sm btn-icon-sm" @click="excluir(fav.id)" title="Remover"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
           </div>
         </div>
       </div>

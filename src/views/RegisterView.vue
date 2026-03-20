@@ -12,12 +12,9 @@ const email = ref('');
 const name = ref('');
 const password = ref('');
 const passwordConfirm = ref('');
-const error = ref('');
 
 async function handleRegister() {
-  error.value = '';
   if (password.value !== passwordConfirm.value) {
-    error.value = 'As senhas não conferem.';
     toast.showToast('As senhas não conferem.', 'error');
     return;
   }
@@ -25,10 +22,10 @@ async function handleRegister() {
     await authStore.register(email.value, name.value, password.value);
     router.push({ name: 'home' });
   } catch (err) {
-    error.value = err.response?.data?.email?.[0]
+    const msg = err.response?.data?.email?.[0]
       || err.response?.data?.password?.[0]
       || 'Erro ao criar conta. Verifique os dados.';
-    toast.showToast(error.value, 'error');
+    toast.showToast(msg, 'error');
   }
 }
 </script>
@@ -54,7 +51,6 @@ async function handleRegister() {
           <label class="label" for="reg-pass-confirm">Confirmar senha</label>
           <input id="reg-pass-confirm" type="password" v-model="passwordConfirm" autocomplete="new-password" required />
         </div>
-        <p v-if="error" class="error-msg">{{ error }}</p>
         <button type="submit" class="btn" style="width:100%">Cadastrar</button>
       </form>
       <p class="text-muted text-sm" style="margin-top:16px;text-align:center">

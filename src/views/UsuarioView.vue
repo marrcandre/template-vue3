@@ -37,7 +37,7 @@ const formatDate = (dateString) => {
       <p>Ativo: <strong>{{ usuario.is_active ? "Sim" : "Não" }}</strong></p>
       <p>Staff: <strong>{{ usuario.is_staff ? "Sim" : "Não" }}</strong></p>
       <p>Último Login: <strong>{{ formatDate(usuario.last_login) || "Nunca logado" }}</strong></p>
-      <p>Grupos: <strong>{{ usuario.groups.map((group) => group.name).join(", ") }}</strong></p>
+      <p>Grupos: <strong>{{ usuario.groups?.length ? usuario.groups.map((group) => group.name).join(", ") : "Nenhum" }}</strong></p>
     </div>
   </div>
   <div class="page" v-else>

@@ -2,17 +2,18 @@
 import { onMounted } from 'vue'
 import { useCompraStore } from '@/stores/compra'
 import { useToastStore } from '@/stores/toast'
+import { formatarPreco } from '@/utils/formatters'
 
 const compraStore = useCompraStore()
 const toast = useToastStore()
 
 onMounted(async () => {
-  await compraStore.getCarrinho()
+  try {
+    await compraStore.getCarrinho()
+  } catch (error) {
+    toast.showToast('Erro ao carregar o carrinho.', 'error')
+  }
 })
-
-function formatarPreco(valor) {
-  return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
 
 async function alterarQuantidade(item, delta) {
   const novaQtd = item.quantidade + delta
@@ -44,6 +45,11 @@ async function finalizar() {
     toast.showToast(error.response?.data?.detail || 'Erro ao finalizar compra.', 'error')
   }
 }
+
+function capaUrl(item) {
+  if (item.livro?.capa?.url) return item.livro.capa.url
+  return 'https://placehold.co/40x56?text=?'
+}
 </script>
 
 <template>
@@ -55,7 +61,8 @@ async function finalizar() {
     </div>
     <div v-else class="carrinho">
       <ul class="list">
-        <li class="list-item" v-for="item in compraStore.carrinho.itens" :key="item.livro">
+        <li class="list-item" v-for="item in compraStore.carrinho.itens" :key="item.livro.id">
+          <img :src="capaUrl(item)" alt="Capa" class="cart-capa" />
           <span class="item-nome">{{ item.livro.titulo || item.livro }}</span>
           <div class="item-qty">
             <button class="btn btn-outline btn-sm btn-icon" @click="alterarQuantidade(item, -1)">−</button>
@@ -63,7 +70,7 @@ async function finalizar() {
             <button class="btn btn-outline btn-sm btn-icon" @click="alterarQuantidade(item, 1)">+</button>
           </div>
           <span class="item-preco">{{ formatarPreco(item.preco) }}</span>
-          <button class="btn btn-ghost btn-sm" @click="removerItem(item)">✕</button>
+          <button class="btn btn-ghost btn-sm btn-icon-sm" @click="removerItem(item)" title="Remover"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </li>
       </ul>
       <div class="carrinho-footer">
@@ -81,6 +88,10 @@ async function finalizar() {
 }
 .item-nome {
   flex: 2;
+}
+.cart-capa {
+  width: 40px; height: 56px; object-fit: cover; border-radius: 4px;
+  flex-shrink: 0;
 }
 .item-qty {
   display: flex;

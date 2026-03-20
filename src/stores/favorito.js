@@ -23,7 +23,8 @@ export const useFavoritoStore = defineStore('favorito', () => {
 
   async function atualizarFavorito(id, payload) {
     await favoritoApi.atualizarFavorito(id, payload)
-    await getFavoritos(meta.value.page || 1)
+    const fav = favoritos.value.find((f) => f.id === id)
+    if (fav) Object.assign(fav, payload)
   }
 
   async function excluirFavorito(id) {
