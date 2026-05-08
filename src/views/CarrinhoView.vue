@@ -69,7 +69,7 @@ function capaUrl(item) {
             <span>{{ item.quantidade }}</span>
             <button class="btn btn-outline btn-sm btn-icon" @click="alterarQuantidade(item, 1)">+</button>
           </div>
-          <span class="item-preco">{{ formatarPreco(item.preco) }}</span>
+          <span class="item-preco">{{ formatarPreco(item.total) }}</span>
           <button class="btn btn-ghost btn-sm btn-icon-sm" @click="removerItem(item)" title="Remover"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </li>
       </ul>

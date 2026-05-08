@@ -128,8 +128,9 @@ textarea { resize: vertical; min-height: 60px; }
 
 /* ===== Toast ===== */
 .toast-container {
-  position: fixed; top: 16px; right: 16px; z-index: 100;
+  position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 99;
   display: flex; flex-direction: column; gap: 8px;
+  width: min(500px, calc(100vw - 24px));
 }
 .toast {
   padding: 12px 20px; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500;

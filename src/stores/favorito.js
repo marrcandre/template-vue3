@@ -30,7 +30,7 @@ export const useFavoritoStore = defineStore('favorito', () => {
   async function excluirFavorito(id) {
     await favoritoApi.excluirFavorito(id)
     const index = favoritos.value.findIndex((f) => f.id === id)
-    favoritos.value.splice(index, 1)
+    if (index >= 0) favoritos.value.splice(index, 1)
   }
 
   async function proximaPagina() {
